@@ -10,6 +10,7 @@ let startFoodCount = 90;
 let animationHandler;
 let mouseCoords = [];
 let mouseIsDown = false;
+let foodLifespan = 1000;
 
 class Food {
   constructor(properties) {
@@ -18,26 +19,15 @@ class Food {
     this.y = Math.random() * canvas.height;
     this.size = 15;
     this.hp = 100;
+    this.initTime = properties.initTime;
     this.index = properties.index;
   }
   update() {
     if (this.hp < 0) {
-      foodArr.splice(this.index, 1);
-
-      for (let i = 0; i < foodArr.length; i++) {
-        foodArr[i].index = i;
-      }
-      for (let i = 0; i < creatureArr.length; ++i) {
-        if (creatureArr[i].goalFoodIndex == this.index) {
-          creatureArr[i].goalFoodIndex = -1;
-          creatureArr[i].isAtFood = false;
-        }
-        if (creatureArr[i].goalFoodIndex > this.index) {
-          creatureArr[i].goalFoodIndex--;
-        }
-      }
-      updateClosestFood();
+      this.remove();
     }
+    if (new Date() - this.initTime > foodLifespan)
+      this.remove();
   }
   draw() {
     ctx.beginPath();
@@ -50,6 +40,23 @@ class Food {
     );
     ctx.fill();
     ctx.closePath();
+  }
+  remove() {
+    foodArr.splice(this.index, 1);
+
+    for (let i = 0; i < foodArr.length; i++) {
+      foodArr[i].index = i;
+    }
+    for (let i = 0; i < creatureArr.length; ++i) {
+      if (creatureArr[i].goalFoodIndex == this.index) {
+        creatureArr[i].goalFoodIndex = -1;
+        creatureArr[i].isAtFood = false;
+      }
+      if (creatureArr[i].goalFoodIndex > this.index) {
+        creatureArr[i].goalFoodIndex--;
+      }
+    }
+    updateClosestFood();
   }
 }
 class Creature {
@@ -65,6 +72,7 @@ class Creature {
     this.speed = properties.speed;
     this.eatSpeed = properties.eatspeed;
     this.maxHunger = properties.hunger;
+    this.hunger = this.maxHunger;
     this.goalFoodIndex = -1;
     this.status = "inactive";
     this.color = `rgb(${Math.random() * 255},${
@@ -76,9 +84,41 @@ class Creature {
     this.isAtFood = false;
   }
   update() {
+    {
+      if (this.status != "inactive") {
+        document.getElementsByClassName(
+          "index"
+        )[0].innerHTML = `index: ${this.properties.index}`;
+        document.getElementsByClassName(
+          "pos"
+        )[0].innerHTML = `x: ${Math.floor(
+          this.x
+        )}, y: ${Math.floor(this.y)}`;
+        document.getElementsByClassName(
+          "health"
+        )[0].innerHTML = `hp: ${
+          Math.round(this.health * 100) / 100
+        }`;
+        document.getElementsByClassName(
+          "hunger"
+        )[0].innerHTML = `hunger: ${
+          Math.round(this.hunger * 100) / 100
+        }`;
+      }
+    }
+    this.hunger -= this.speed / 100;
+    this.hunger = (this.hunger >= 0) * this.hunger;
+    this.health -= this.hunger == 0;
+    if (this.health <= 0) {
+      this.isAlive = false;
+      this.health = 0;
+      for (let i = 0; i < creatureArr.length; ++i) {
+        creatureArr[i].index = i;
+      }
+      creatureArr.splice(this.index, 1);
+    }
     if (this.goalFoodIndex == -1) return;
     if (this.isAlive) {
-      this.health -= this.speed / 100;
       this.x += (this.vx * this.speed) / 10;
       this.y += (this.vy * this.speed) / 10;
       if (
@@ -99,32 +139,8 @@ class Creature {
       } else if (this.isAtFood) {
         foodArr[this.goalFoodIndex].hp -=
           this.eatSpeed / 100;
-        this.health += this.eatSpeed / 200;
+        this.hunger += this.eatSpeed / 200;
       }
-      if (this.health <= 0) {
-        this.isAlive = false;
-        this.health = 0;
-        for (let i = 0; i < creatureArr.length; ++i) {
-          creatureArr[i].index = i;
-        }
-        creatureArr.splice(this.index, 1);
-      }
-    }
-
-    if (this.status != "inactive" && this.isAlive) {
-      document.getElementsByClassName(
-        "index"
-      )[0].innerHTML = `index: ${this.properties.index}`;
-      document.getElementsByClassName(
-        "pos"
-      )[0].innerHTML = `x: ${Math.floor(
-        this.x
-      )}, y: ${Math.floor(this.y)}`;
-      document.getElementsByClassName(
-        "health"
-      )[0].innerHTML = `hp: ${
-        Math.round(this.health * 100) / 100
-      }`;
     }
   }
   draw() {
@@ -239,11 +255,12 @@ function loop() {
   }
   if (
     Math.random() <
-    (0.05 * creatureArr.length) / startCreatureCount
+    (0.1 * creatureArr.length) / startCreatureCount
   ) {
     foodArr.push(
       new Food({
         index: foodArr.length,
+        initTime: new Date() - 0,
       })
     );
     updateClosestFood();

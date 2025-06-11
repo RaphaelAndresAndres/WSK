@@ -191,14 +191,6 @@ function init() {
       chooseClosestCreature("preview");
     }
   });
-  canvas.addEventListener("click", (_) => {
-    foodArr.push(
-      new Food({
-        index: foodArr.length,
-      })
-    );
-    updateClosestFood();
-  });
 
   animationHandler = requestAnimationFrame(loop);
   loop();

@@ -229,7 +229,6 @@ function updateClosestFood() {
 }
 
 function loop() {
-  console.clear();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let i = 0; i < creatureArr.length; ++i) {
     creatureArr[i].draw();

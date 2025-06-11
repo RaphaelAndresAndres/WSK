@@ -5,7 +5,7 @@ canvas.height = window.innerHeight;
 
 let creatureArr = [];
 let foodArr = [];
-let startCreatureCount = 30;
+let startCreatureCount = 100;
 let startFoodCount = 90;
 let animationHandler;
 let mouseCoords = [];
@@ -59,6 +59,7 @@ class Creature {
     this.y = Math.random() * canvas.height;
     this.vx = 0;
     this.vy = 0;
+    this.index = properties.index;
     this.maxHealth = properties.health;
     this.health = this.maxHealth;
     this.speed = properties.speed;
@@ -77,7 +78,7 @@ class Creature {
   update() {
     if (this.goalFoodIndex == -1) return;
     if (this.isAlive) {
-      this.health -= this.speed / 1000;
+      this.health -= this.speed / 100;
       this.x += (this.vx * this.speed) / 10;
       this.y += (this.vy * this.speed) / 10;
       if (
@@ -100,9 +101,13 @@ class Creature {
           this.eatSpeed / 100;
         this.health += this.eatSpeed / 200;
       }
-      if (this.health < 0) {
+      if (this.health <= 0) {
         this.isAlive = false;
         this.health = 0;
+        for (let i = 0; i < creatureArr.length; ++i) {
+          creatureArr[i].index = i;
+        }
+        creatureArr.splice(this.index, 1);
       }
     }
 
@@ -232,7 +237,10 @@ function loop() {
     foodArr[i].draw();
     foodArr[i].update();
   }
-  if (Math.random() < 0.05) {
+  if (
+    Math.random() <
+    (0.05 * creatureArr.length) / startCreatureCount
+  ) {
     foodArr.push(
       new Food({
         index: foodArr.length,

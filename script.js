@@ -5,7 +5,7 @@ canvas.height = window.innerHeight;
 
 let creatureArr = [];
 let foodArr = [];
-let startCreatureCount = 2;
+let startCreatureCount = 30;
 let startFoodCount = 90;
 let animationHandler;
 let mouseCoords = [];
@@ -23,18 +23,18 @@ class Food {
   update() {
     if (this.hp < 0) {
       foodArr.splice(this.index, 1);
+
+      for (let i = 0; i < foodArr.length; i++) {
+        foodArr[i].index = i;
+      }
       for (let i = 0; i < creatureArr.length; ++i) {
         if (creatureArr[i].goalFoodIndex == this.index) {
           creatureArr[i].goalFoodIndex = -1;
           creatureArr[i].isAtFood = false;
         }
-      }
-      for (
-        let i = this.index + 1;
-        i < foodArr.length;
-        i++
-      ) {
-        foodArr[i].index--;
+        if (creatureArr[i].goalFoodIndex > this.index) {
+          creatureArr[i].goalFoodIndex--;
+        }
       }
       updateClosestFood();
     }
@@ -98,6 +98,7 @@ class Creature {
       } else if (this.isAtFood) {
         foodArr[this.goalFoodIndex].hp -=
           this.eatSpeed / 100;
+        this.health += this.eatSpeed / 200;
       }
       if (this.health < 0) {
         this.isAlive = false;
@@ -228,6 +229,7 @@ function updateClosestFood() {
 }
 
 function loop() {
+  console.clear();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let i = 0; i < creatureArr.length; ++i) {
     creatureArr[i].draw();
@@ -239,10 +241,10 @@ function loop() {
     foodArr[i].draw();
     foodArr[i].update();
   }
-  if (Math.random() < 0.01) {
+  if (Math.random() < 0.05) {
     foodArr.push(
       new Food({
-        index: foodArr.length - 1,
+        index: foodArr.length,
       })
     );
     updateClosestFood();

@@ -5,41 +5,47 @@ canvas.height = window.innerHeight;
 
 let creatureArr = [];
 let foodArr = [];
-let startCreatureCount = 10000;
+let startCreatureCount = 100;
 let startFoodCount = 90;
 let animationHandler;
 let mouseCoords = [];
 let mouseIsDown = false;
-let foodLifespan = 10000;
-
+let foodLifespan = 1000;
+let simulationIsRunning = false;
+let foodSpawnPercentage = 0.05;
+let gameRules = {
+  creatureSpawnsFoodOnDeath: true,
+};
 class Food {
   constructor(properties) {
     this.properties = properties;
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
+    this.x = properties.x ?? Math.random() * canvas.width;
+    this.y = properties.y ?? Math.random() * canvas.height;
     this.size = 15;
     this.hp = 1000;
-    this.initTime = properties.initTime;
+    this.initTime = properties.initTime ?? new Date() - 0;
     this.index = properties.index;
   }
   update() {
-    if (this.hp < 0) {
+    if (this.hp <= 0) {
       this.remove();
     }
     if (new Date() - this.initTime > foodLifespan)
       this.remove();
   }
   draw() {
-    ctx.beginPath();
-    ctx.fillStyle = "purple";
-    ctx.rect(
-      this.x - this.size / 2,
-      this.y - this.size,
-      this.size,
-      this.size
-    );
-    ctx.fill();
-    ctx.closePath();
+    if (this.hp > 0) {
+      ctx.beginPath();
+      ctx.fillStyle = "purple";
+      ctx.rect(
+        this.x - this.size / 2,
+        this.y - this.size,
+        this.size,
+        this.size
+      );
+      ctx.fill();
+      ctx.closePath();
+    }
   }
   remove() {
     foodArr.splice(this.index, 1);
@@ -116,6 +122,16 @@ class Creature {
         creatureArr[i].index = i;
       }
       creatureArr.splice(this.index, 1);
+      if (gameRules.creatureSpawnsFoodOnDeath) {
+        foodArr.push(
+          new Food({
+            index: foodArr.length,
+            x: this.x,
+            y: this.y,
+          })
+        );
+        updateClosestFood();
+      }
     }
     if (this.goalFoodIndex == -1) return;
     if (this.isAlive) {
@@ -158,8 +174,22 @@ class Creature {
 }
 
 document.onload = init();
+function resetSim() {
+  cancelAnimationFrame(animationHandler);
+  foodArr = [];
+  creatureArr = [];
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+function startSim() {
+  {
+    startCreatureCount = parseInt(
+      document.getElementById("startCreatureCount").value
+    );
+    foodSpawnPercentage = parseFloat(
+      document.getElementById("foodSpawnPercentage").value
+    );
+  }
 
-function init() {
   for (let i = 0; i < startCreatureCount; ++i) {
     let hpRandom = Math.ceil(Math.random() * 100);
     let foodRandom = Math.ceil(Math.random() * 100);
@@ -173,6 +203,11 @@ function init() {
       })
     );
   }
+
+  animationHandler = requestAnimationFrame(loop);
+  simulationIsRunning = true;
+}
+function init() {
   Math.distance = function (a, b) {
     return Math.sqrt(
       Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2)
@@ -213,9 +248,15 @@ function init() {
       chooseClosestCreature("preview");
     }
   });
+}
 
-  animationHandler = requestAnimationFrame(loop);
-  loop();
+function toggleSimulation() {
+  if (simulationIsRunning)
+    cancelAnimationFrame(animationHandler);
+  else {
+    animationHandler = requestAnimationFrame(loop);
+  }
+  simulationIsRunning = !simulationIsRunning;
 }
 
 function updateClosestFood() {
@@ -256,7 +297,8 @@ function loop() {
   }
   if (
     Math.random() <
-    (0.1 * creatureArr.length) / startCreatureCount
+    (foodSpawnPercentage * creatureArr.length) /
+      startCreatureCount
   ) {
     foodArr.push(
       new Food({
@@ -266,5 +308,5 @@ function loop() {
     );
     updateClosestFood();
   }
-  requestAnimationFrame(loop);
+  animationHandler = requestAnimationFrame(loop);
 }

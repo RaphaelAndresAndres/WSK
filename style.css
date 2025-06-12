@@ -1,37 +1,61 @@
-*{
-    margin:0;
+* {
+  margin: 0;
 }
-body{
-    overflow:hidden;
-    canvas#canvas{
-        background:rgba(0,0,0,.1);
-        position:absolute;
+body {
+  overflow: hidden;
+  canvas#canvas {
+    background: rgba(0, 0, 0, 0.1);
+    position: absolute;
+  }
+  div.menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300px;
+    min-height: 500px;
+    outline: solid;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    div.header {
+      display: flex;
+      font-size: 2em;
+      justify-content: center;
     }
-    div.menu{
-        position:absolute;
-        top:0;
-        left:0;
-        width:300px;
-        min-height:500px;
-        outline:solid;
-        background:rgba(0,0,0,.3);
-        z-index: 1;
-        div.header{
-            display:flex;
-            font-size:2em;
-            justify-content: center;
-        }
-        div.toggle{
-            position: absolute;
-            top:5px;
-            left:5px;
-            width:25px;
-            height:25px;
-            background:black;
-        }
-        div.properties{
-            margin:10px;
-            font-size:1.1em;
-        }
+    div.toggle {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      width: 25px;
+      height: 25px;
+      background: black;
     }
+    div.properties {
+      margin: 10px;
+      font-size: 1.1em;
+    }
+  }
+  div.settings {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 400px;
+    min-height: 500px;
+    outline: solid;
+    background: rgba(255, 255, 255, 0.4);
+    z-index: 1;
+    > * {
+      margin: 10px;
+    }
+    div.header,
+    div.startreset {
+      display: flex;
+      font-size: 2em;
+      justify-content: center;
+      > button {
+        margin: 10px;
+        padding: 10px;
+        font-size: 1.1rem;
+      }
+    }
+  }
 }

@@ -2,7 +2,7 @@
   margin: 0;
 }
 body {
-  overflow: hidden;
+  overflow-x: hidden;
   canvas#canvas {
     background: rgba(0, 0, 0, 0.1);
     position: absolute;
@@ -16,6 +16,9 @@ body {
     outline: solid;
     background: rgba(0, 0, 0, 0.3);
     z-index: 1;
+    > * {
+      margin: 10px;
+    }
     div.header {
       display: flex;
       font-size: 2em;
@@ -57,5 +60,16 @@ body {
         font-size: 1.1rem;
       }
     }
+    div.controlBox {
+      display: flex;
+      flex-direction: column;
+      > * {
+        margin: 5px;
+      }
+    }
+  }
+  canvas#creatureTimeDiagram {
+    position: absolute;
+    top: 100vh;
   }
 }

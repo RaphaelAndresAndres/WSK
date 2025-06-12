@@ -1,5 +1,6 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
@@ -11,6 +12,7 @@ let animationHandler;
 let mouseCoords = [];
 let mouseIsDown = false;
 let foodLifespan = 1000;
+let foodHp = 100;
 let simulationIsRunning = false;
 let foodSpawnPercentage = 0.05;
 let gameRules = {
@@ -22,7 +24,7 @@ class Food {
     this.x = properties.x ?? Math.random() * canvas.width;
     this.y = properties.y ?? Math.random() * canvas.height;
     this.size = 15;
-    this.hp = 1000;
+    this.hp = foodHp;
     this.initTime = properties.initTime ?? new Date() - 0;
     this.index = properties.index;
   }
@@ -188,6 +190,14 @@ function startSim() {
     foodSpawnPercentage = parseFloat(
       document.getElementById("foodSpawnPercentage").value
     );
+    foodLifespan =
+      1000 *
+      parseFloat(
+        document.getElementById("foodLifespan").value
+      );
+    foodHp = parseFloat(
+      document.getElementById("foodHp").value
+    );
   }
 
   for (let i = 0; i < startCreatureCount; ++i) {
@@ -208,11 +218,17 @@ function startSim() {
   simulationIsRunning = true;
 }
 function init() {
+  /*document.getElementById("foodSpawnPercentage").value =
+    foodSpawnPercentage;
+  document.getElementById("foodLifespan").value =
+    foodLifespan;*/
   Math.distance = function (a, b) {
     return Math.sqrt(
       Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2)
     );
   };
+  {
+  }
   Math.clamp = function (x, min, max) {
     return Math.min(Math.max(x, min), max);
   };
@@ -308,5 +324,9 @@ function loop() {
     );
     updateClosestFood();
   }
+  document.getElementsByClassName(
+    "creatureCount"
+  )[0].innerHTML =
+    "Creatures alive:  " + creatureArr.length;
   animationHandler = requestAnimationFrame(loop);
 }

@@ -5,12 +5,12 @@ canvas.height = window.innerHeight;
 
 let creatureArr = [];
 let foodArr = [];
-let startCreatureCount = 100;
+let startCreatureCount = 10000;
 let startFoodCount = 90;
 let animationHandler;
 let mouseCoords = [];
 let mouseIsDown = false;
-let foodLifespan = 1000;
+let foodLifespan = 10000;
 
 class Food {
   constructor(properties) {
@@ -18,7 +18,7 @@ class Food {
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
     this.size = 15;
-    this.hp = 100;
+    this.hp = 1000;
     this.initTime = properties.initTime;
     this.index = properties.index;
   }
@@ -108,7 +108,7 @@ class Creature {
     }
     this.hunger -= this.speed / 100;
     this.hunger = (this.hunger >= 0) * this.hunger;
-    this.health -= this.hunger == 0;
+    this.health -= (this.hunger == 0) * 0.05;
     if (this.health <= 0) {
       this.isAlive = false;
       this.health = 0;
@@ -139,7 +139,7 @@ class Creature {
       } else if (this.isAtFood) {
         foodArr[this.goalFoodIndex].hp -=
           this.eatSpeed / 100;
-        this.hunger += this.eatSpeed / 200;
+        this.hunger += this.eatSpeed / 100;
       }
     }
   }
@@ -182,6 +182,7 @@ function init() {
     return Math.min(Math.max(x, min), max);
   };
   function chooseClosestCreature(status) {
+    if (creatureArr.length == 0) return;
     let min_distance = 1000;
     let index = 0;
     for (let i = 0; i < creatureArr.length; ++i) {

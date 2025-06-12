@@ -41,7 +41,7 @@ class Food {
       ctx.fillStyle = "purple";
       ctx.rect(
         this.x - this.size / 2,
-        this.y - this.size,
+        this.y - this.size / 2,
         this.size,
         this.size
       );
@@ -199,6 +199,7 @@ function startSim() {
       document.getElementById("foodHp").value
     );
   }
+  initPlots();
 
   for (let i = 0; i < startCreatureCount; ++i) {
     let hpRandom = Math.ceil(Math.random() * 100);
@@ -218,10 +219,6 @@ function startSim() {
   simulationIsRunning = true;
 }
 function init() {
-  /*document.getElementById("foodSpawnPercentage").value =
-    foodSpawnPercentage;
-  document.getElementById("foodLifespan").value =
-    foodLifespan;*/
   Math.distance = function (a, b) {
     return Math.sqrt(
       Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2)
@@ -328,5 +325,6 @@ function loop() {
     "creatureCount"
   )[0].innerHTML =
     "Creatures alive:  " + creatureArr.length;
+  updatePlots();
   animationHandler = requestAnimationFrame(loop);
 }

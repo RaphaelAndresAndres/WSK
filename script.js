@@ -15,8 +15,22 @@ let foodLifespan = 1000;
 let foodHp = 100;
 let simulationIsRunning = false;
 let foodSpawnPercentage = 0.05;
+let speedMultiplier = 0.1;
+let frameCounter = 0;
+
 let gameRules = {
-  creatureSpawnsFoodOnDeath: true,
+  creatureSpawnsFoodOnDeath: false,
+};
+let evolutionParameters = {
+  survivorCount: parseInt(
+    document.getElementById("nsurvivors").value
+  ),
+  mutationRate: parseFloat(
+    document.getElementById("mutationrate").value
+  ),
+  generationCount: parseInt(
+    document.getElementById("ngenerations").value
+  ),
 };
 class Food {
   constructor(properties) {
@@ -77,7 +91,7 @@ class Creature {
     this.index = properties.index;
     this.maxHealth = properties.health;
     this.health = this.maxHealth;
-    this.speed = properties.speed;
+    this.speed = properties.speed * speedMultiplier;
     this.eatSpeed = properties.eatspeed;
     this.maxHunger = properties.hunger;
     this.hunger = this.maxHunger;
@@ -137,8 +151,8 @@ class Creature {
     }
     if (this.goalFoodIndex == -1) return;
     if (this.isAlive) {
-      this.x += (this.vx * this.speed) / 10;
-      this.y += (this.vy * this.speed) / 10;
+      this.x += this.vx * this.speed;
+      this.y += this.vy * this.speed;
       if (
         Math.pow(
           this.x - foodArr[this.goalFoodIndex].x,
@@ -148,7 +162,7 @@ class Creature {
             this.y - foodArr[this.goalFoodIndex].y,
             2
           ) <
-          50 &&
+          100 &&
         !this.isAtFood
       ) {
         this.vx = 0;
@@ -164,7 +178,7 @@ class Creature {
   draw() {
     if (!this.isAlive) return;
     ctx.beginPath();
-    ctx.arc(this.x, this.y, 10, 0, Math.PI * 2);
+    ctx.rect(this.x - 5, this.y - 5, 10, 10);
     ctx.fillStyle = this.color;
     ctx.strokeStyle = "black";
     if (this.status == "preview") ctx.fillStyle = "white";
@@ -174,6 +188,8 @@ class Creature {
     ctx.closePath();
   }
 }
+
+function createNewGeneration() {}
 
 document.onload = init();
 function resetSim() {
@@ -198,6 +214,8 @@ function startSim() {
     foodHp = parseFloat(
       document.getElementById("foodHp").value
     );
+    gameRules.creatureSpawnsFoodOnDeath =
+      document.getElementById("spawnFoodOnDeath").checked;
   }
   initPlots();
 
@@ -297,17 +315,30 @@ function updateClosestFood() {
 }
 
 function loop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let i = 0; i < creatureArr.length; ++i) {
-    creatureArr[i].draw();
+  if (
+    creatureArr.length >= evolutionParameters.survivorCount
+  ) {
   }
   for (let i = 0; i < creatureArr.length; ++i) {
     creatureArr[i].update();
   }
   for (let i = 0; i < foodArr.length; ++i) {
-    foodArr[i].draw();
     foodArr[i].update();
   }
+  if (
+    frameCounter %
+      parseInt(document.getElementById("nthframe").value) ==
+    0
+  ) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < creatureArr.length; ++i) {
+      creatureArr[i].draw();
+    }
+    for (let i = 0; i < foodArr.length; ++i) {
+      foodArr[i].draw();
+    }
+  }
+
   if (
     Math.random() <
     (foodSpawnPercentage * creatureArr.length) /
@@ -327,4 +358,5 @@ function loop() {
     "Creatures alive:  " + creatureArr.length;
   updatePlots();
   animationHandler = requestAnimationFrame(loop);
+  frameCounter++;
 }

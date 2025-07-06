@@ -66,6 +66,29 @@ body {
       > * {
         margin: 5px;
       }
+      div.gamerules > div {
+        display: flex;
+        > * {
+          padding: 5px;
+        }
+      }
+      div.gamerules h4 {
+        text-align: center;
+      }
+    }
+    div.evolutionparameters {
+      h4 {
+        text-align: center;
+      }
+      > div {
+        display: flex;
+        > * {
+          margin: 5px;
+        }
+        input[type="number"] {
+          width: 50px;
+        }
+      }
     }
   }
   canvas#creatureTimeDiagram {

@@ -71,6 +71,67 @@
           title="Food hp"
           value="100"
         />
+        <div class="gamerules">
+          <h4>Game Rules</h4>
+          <div class="spawnFoodOnDeath">
+            <input
+              type="checkbox"
+              name=""
+              id="spawnFoodOnDeath"
+            />
+            <p>Spawn Food on Death</p>
+          </div>
+          <div class="skipframes">
+            <p>Nth frame drawn:</p>
+
+            <input
+              type="range"
+              min="1"
+              max="100"
+              value="20"
+              title="A value of 10 means every 10 calculated frames, one frame gets drawn, incrases performance."
+              onchange="document.getElementsByClassName('nthframe')[0].innerHTML = this.value"
+              onmousemove="document.getElementsByClassName('nthframe')[0].innerHTML = this.value"
+              id="nthframe"
+            />
+            <p class="nthframe"></p>
+          </div>
+        </div>
+        <div class="evolutionparameters">
+          <h4>Evolution parameters</h4>
+          <div class="nsurvivors">
+            <p>Nr. of survivors</p>
+            <input
+              type="number"
+              name="Number of survivors"
+              title="Number of survivors for the next generation"
+              id="nsurvivors"
+              onchange="evolutionParameters.survivorCount = parseInt(this.value);"
+              value="10"
+            />
+          </div>
+          <div class="mutationrate">
+            <p>Mutation rate</p>
+            <input
+              type="number"
+              name="Mutation rate"
+              id="mutationrate"
+              title="Mutation rate: 0 = no mutation, higher = more mutation"
+              onchange="evolutionParameters.mutationRate = parseFloat(this.value);"
+              value="0.5"
+            />
+          </div>
+          <div class="ngenerations">
+            <p>Nr of generations</p>
+            <input
+              type="number"
+              name="Number of generations"
+              id="ngenerations"
+              onchange="evolutionParameters.generationCount = parseInt(this.value);"
+              value="5"
+            />
+          </div>
+        </div>
       </div>
     </div>
     <canvas id="creatureTimeDiagram"></canvas>

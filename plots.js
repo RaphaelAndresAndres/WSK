@@ -19,8 +19,10 @@ function updatePlots() {
   ctCreatureArr[ctCounter] = creatureArr.length;
   ++ctCounter;
   drawCTPlot();
+  if (ctCounter == valueCount) {
+    initPlots();
+  }
 }
-
 function drawCTPlot() {
   {
     //draw line
@@ -31,7 +33,7 @@ function drawCTPlot() {
       startCreatureCount;
     let offsetY = creatureTimeCanvas.height - limits;
 
-    /*    ctctx.beginPath();
+    ctctx.beginPath();
     ctctx.moveTo(
       (ctCounter - 1) * scaleX + limits,
       offsetY - ctCreatureArr[ctCounter - 1] * scaleY
@@ -43,8 +45,8 @@ function drawCTPlot() {
     ctctx.lineWidth = 3;
     ctctx.stroke();
     ctctx.closePath();
-*/
-    let width = 10;
+
+    /*let width = 10;
     ctctx.beginPath();
     ctctx.rect(
       ctCounter * scaleX + limits - width / 2,
@@ -53,11 +55,11 @@ function drawCTPlot() {
       width,
       width
     );
-    ctctx.fillStyle = `hsl(${ctCounter / 5}, 100%, 50%)`;
+    //ctctx.fillStyle = `hsl(${ctCounter / 5}, 100%, 50%)`;
 
-    //ctctx.fillStyle = "red";
+    ctctx.fillStyle = "black";
     ctctx.fill();
-    ctctx.closePath();
+    ctctx.closePath();*/
   }
 }
 

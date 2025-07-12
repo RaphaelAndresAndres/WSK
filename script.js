@@ -221,6 +221,13 @@ function resetSim() {
 }
 function startSim() {
   {
+    if (simulationIsRunning) {
+      new Notification(
+        "Simulation is already running. ",
+        "warning"
+      );
+      return;
+    }
     startCreatureCount = parseInt(
       document.getElementById("startCreatureCount").value
     );
@@ -313,10 +320,12 @@ function init() {
 }
 
 function toggleSimulation() {
-  if (simulationIsRunning)
+  if (simulationIsRunning) {
     cancelAnimationFrame(animationHandler);
-  else {
+    new Notification("Paused simulation", "log");
+  } else {
     animationHandler = requestAnimationFrame(loop);
+    new Notification("Resumed simulation", "log");
   }
   simulationIsRunning = !simulationIsRunning;
 }

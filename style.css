@@ -95,4 +95,51 @@ body {
     position: absolute;
     top: 100vh;
   }
+  div.notifications {
+    position: fixed;
+    display: flex;
+    bottom: 0;
+    right: 0;
+    height: 500px;
+    width: 370px;
+    flex-direction: column-reverse;
+    overflow-y: scroll;
+    div.notification {
+      display: block;
+      flex-shrink: 0;
+      width: 330px;
+      height: 40px;
+      margin: 10px;
+      padding: 10px;
+      outline: 2px solid;
+      opacity: 0.8;
+      background: rgba(255, 255, 255, 0.8);
+      animation: notification_fade 5s linear;
+      transition: all 0.3s ease-in-out;
+      cursor: pointer;
+      &:hover {
+        animation-play-state: paused;
+        opacity: 1 !important;
+      }
+      &.warning {
+        background: rgba(255, 215, 38, 0.8);
+      }
+      &.error {
+        background: rgba(255, 45, 45, 0.6);
+      }
+      &.log {
+        background: rgba(30, 187, 30, 0.6);
+      }
+    }
+  }
+}
+
+@keyframes notification_fade {
+  0%,
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+  }
 }

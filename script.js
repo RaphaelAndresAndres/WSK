@@ -188,11 +188,32 @@ class Creature {
     ctx.closePath();
   }
 }
-
+class Notification {
+  constructor(message, type) {
+    this.message = message;
+    this.type = type;
+    this.startTime;
+    this.elem;
+    this.parentElem =
+      document.getElementsByClassName("notifications")[0];
+    this.init();
+  }
+  init() {
+    this.startTime = new Date() - 0;
+    this.elem = document.createElement("div");
+    this.elem.classList.add("notification", this.type);
+    this.elem.innerHTML = `${this.message}`;
+    this.parentElem.append(this.elem);
+    setTimeout(() => {
+      this.parentElem.removeChild(this.elem);
+    }, 5000);
+  }
+}
 function createNewGeneration() {}
 
 document.onload = init();
 function resetSim() {
+  new Notification("Resetting simulation...", "log");
   cancelAnimationFrame(animationHandler);
   foodArr = [];
   creatureArr = [];
@@ -217,6 +238,16 @@ function startSim() {
     gameRules.creatureSpawnsFoodOnDeath =
       document.getElementById("spawnFoodOnDeath").checked;
   }
+  if (
+    startCreatureCount <= evolutionParameters.survivorCount
+  ) {
+    new Notification(
+      "Your starting creature count cannot be equal or less than the survivor count!",
+      "error"
+    );
+    return;
+  }
+  new Notification("Started simulation...", "log");
   initPlots();
 
   for (let i = 0; i < startCreatureCount; ++i) {
@@ -315,10 +346,6 @@ function updateClosestFood() {
 }
 
 function loop() {
-  if (
-    creatureArr.length >= evolutionParameters.survivorCount
-  ) {
-  }
   for (let i = 0; i < creatureArr.length; ++i) {
     creatureArr[i].update();
   }
@@ -359,4 +386,14 @@ function loop() {
   updatePlots();
   animationHandler = requestAnimationFrame(loop);
   frameCounter++;
+  if (
+    creatureArr.length <= evolutionParameters.survivorCount
+  ) {
+    new Notification(
+      "Your simulation has stopped. Starting new generation...",
+      "log"
+    );
+    resetSim();
+    createNewGeneration();
+  }
 }

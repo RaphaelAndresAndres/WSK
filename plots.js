@@ -12,7 +12,11 @@ let ctCreatureArr = new Float32Array(valueCount);
 ctCreatureArr[0] = startCreatureCount;
 let ctCounter = 1;
 let limits = 30;
-
+let plotStepSize = 100;
+let plotData = [];
+plotData[0] = new Float32Array(1e4 / plotStepSize);
+plotData[1] = new Float32Array(1e4 / plotStepSize);
+let fillCounter = 0;
 function updatePlots() {
   if (ctCounter == valueCount) return;
   ctTimeArr[ctCounter] = ctCounter;
@@ -32,34 +36,34 @@ function drawCTPlot() {
       (creatureTimeCanvas.height - 2 * limits) /
       startCreatureCount;
     let offsetY = creatureTimeCanvas.height - limits;
-
-    ctctx.beginPath();
-    ctctx.moveTo(
-      (ctCounter - 1) * scaleX + limits,
-      offsetY - ctCreatureArr[ctCounter - 1] * scaleY
-    );
-    ctctx.lineTo(
+    let [x, y] = [
       ctCounter * scaleX + limits,
-      offsetY - creatureArr.length * scaleY
-    );
-    ctctx.lineWidth = 3;
-    ctctx.stroke();
-    ctctx.closePath();
-
-    /*let width = 10;
-    ctctx.beginPath();
-    ctctx.rect(
-      ctCounter * scaleX + limits - width / 2,
       offsetY - creatureArr.length * scaleY,
-      width / 2,
-      width,
-      width
-    );
-    //ctctx.fillStyle = `hsl(${ctCounter / 5}, 100%, 50%)`;
-
-    ctctx.fillStyle = "black";
-    ctctx.fill();
-    ctctx.closePath();*/
+    ];
+    if (fillCounter % plotStepSize == 0) {
+      ctctx.beginPath();
+      ctctx.arc(x, y, 3, 0, 2 * Math.PI);
+      ctctx.strokeStyle = "red";
+      ctctx.stroke();
+      ctctx.closePath();
+      if (fillCounter / plotStepSize < 1e4) {
+        plotData[0][fillCounter / plotStepSize] = x;
+        plotData[1][fillCounter / plotStepSize] = y;
+      }
+      ctctx.beginPath();
+      ctctx.moveTo(
+        plotData[0][fillCounter / plotStepSize - 1],
+        plotData[1][fillCounter / plotStepSize - 1]
+      );
+      ctctx.lineTo(
+        plotData[0][fillCounter / plotStepSize],
+        plotData[1][fillCounter / plotStepSize]
+      );
+      ctctx.strokeStyle = "black";
+      ctctx.stroke();
+      ctctx.closePath();
+    }
+    ++fillCounter;
   }
 }
 
@@ -77,7 +81,7 @@ function initPlots() {
     ctCreatureArr = new Float32Array(valueCount);
   }
   {
-    //draw grid
+    //draw helper lines
     {
       //draw axes
       ctctx.beginPath();
@@ -101,6 +105,88 @@ function initPlots() {
       );
       ctctx.stroke();
       ctctx.closePath();
+    }
+    {
+      //draw grid
+      const gridSize = 50;
+      for (
+        let x = limits;
+        x < creatureTimeCanvas.width - limits;
+        x += gridSize
+      ) {
+        ctctx.beginPath();
+        ctctx.moveTo(x, limits);
+        ctctx.lineTo(x, creatureTimeCanvas.height - limits);
+        ctctx.strokeStyle = "grey";
+        ctctx.lineWidth = 1;
+        ctctx.stroke();
+        ctctx.closePath();
+      }
+      for (
+        let y = limits;
+        y < creatureTimeCanvas.height - limits;
+        y += gridSize
+      ) {
+        ctctx.beginPath();
+        ctctx.moveTo(limits, y);
+        ctctx.lineTo(creatureTimeCanvas.width - limits, y);
+        ctctx.strokeStyle = "grey";
+        ctctx.lineWidth = 1;
+        ctctx.stroke();
+        ctctx.closePath();
+      }
+    }
+    {
+      //draw axis descriptions
+      //draw the legend box
+
+      ctctx.beginPath();
+      ctctx.clearRect(
+        creatureTimeCanvas.width - limits - 200,
+        limits,
+        200,
+        50
+      );
+      ctctx.rect(
+        creatureTimeCanvas.width - limits - 200,
+        limits,
+        200,
+        50
+      );
+      ctctx.strokeStyle = "black";
+      ctctx.lineWidth = 2;
+      ctctx.stroke();
+      ctctx.closePath();
+      ctctx.font = "30px Arial";
+      ctctx.fillText(
+        "Data points",
+        creatureTimeCanvas.width - limits - 160,
+        limits + 35
+      );
+
+      ctctx.beginPath();
+      ctctx.arc(
+        creatureTimeCanvas.width - limits - 180,
+        limits + 25,
+        8,
+        0,
+        Math.PI * 2
+      );
+      ctctx.strokeStyle = "red";
+      ctctx.stroke();
+      ctctx.closePath();
+
+      ctctx.fillText(
+        "Alive creatures dependent on time",
+        creatureTimeCanvas.width / 2 - 180,
+        limits - 5
+      );
+
+      ctctx.save();
+      ctctx.beginPath();
+      ctctx.rotate(90);
+      ctctx.closePath();
+      ctctx.restore();
     }
   }
 }

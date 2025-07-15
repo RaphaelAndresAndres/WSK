@@ -108,6 +108,7 @@
               id="nsurvivors"
               onchange="evolutionParameters.survivorCount = parseInt(this.value);"
               value="10"
+              min="0"
             />
           </div>
           <div class="mutationrate">
@@ -119,6 +120,9 @@
               title="Mutation rate: 0 = no mutation, higher = more mutation"
               onchange="evolutionParameters.mutationRate = parseFloat(this.value);"
               value="0.5"
+              max="1"
+              min="0"
+              step="0.1"
             />
           </div>
           <div class="ngenerations">
@@ -129,6 +133,7 @@
               id="ngenerations"
               onchange="evolutionParameters.generationCount = parseInt(this.value);"
               value="5"
+              min="1"
             />
           </div>
         </div>

@@ -312,7 +312,10 @@ function init() {
     chooseClosestCreature("active");
   });
   canvas.addEventListener("mousemove", (e) => {
-    mouseCoords = [e.clientX, e.clientY];
+    mouseCoords = [
+      e.clientX,
+      e.clientY + document.scrollingElement.scrollTop,
+    ];
     if (mouseIsDown) {
       chooseClosestCreature("preview");
     }

@@ -121,6 +121,12 @@ function initPlots() {
         ctctx.lineWidth = 1;
         ctctx.stroke();
         ctctx.closePath();
+        ctctx.font = "20px Arial";
+        ctctx.fillText(
+          x - limits,
+          x,
+          creatureTimeCanvas.height - limits
+        );
       }
       for (
         let y = limits;
@@ -134,6 +140,20 @@ function initPlots() {
         ctctx.lineWidth = 1;
         ctctx.stroke();
         ctctx.closePath();
+        ctctx.font = "20px Arial";
+        ctctx.fillText(
+          Math.round(
+            startCreatureCount -
+              (startCreatureCount /
+                Math.ceil(
+                  (creatureTimeCanvas.height - 2 * limits) /
+                    gridSize
+                )) *
+                ((y - limits) / gridSize)
+          ),
+          limits,
+          y
+        );
       }
     }
     {
@@ -184,9 +204,22 @@ function initPlots() {
 
       ctctx.save();
       ctctx.beginPath();
-      ctctx.rotate(90);
+      ctctx.translate(
+        limits,
+        creatureTimeCanvas.height / 2
+      );
+      ctctx.rotate((3 * Math.PI) / 2);
+      ctctx.font = "25px Arial";
+      ctctx.fillText("creatures", -80, -10);
+      ctctx.fill();
       ctctx.closePath();
       ctctx.restore();
+
+      ctctx.fillText(
+        "time step",
+        creatureTimeCanvas.width / 2 - 70,
+        creatureTimeCanvas.height - 5
+      );
     }
   }
 }

@@ -139,7 +139,54 @@
         </div>
       </div>
     </div>
-    <canvas id="creatureTimeDiagram"></canvas>
+    <div class="creatureCanvasBox">
+      <canvas id="creatureTimeDiagram"></canvas>
+      <input
+        type="checkbox"
+        name="creatureTimeMenuToggle"
+        id=""
+        checked="false"
+      />
+      <div class="creatureTimeMenu">
+        <h4>Plot Menu</h4>
+        <div class="updateSpeed">
+          <p>Update Speed</p>
+          <input
+            type="number"
+            name="updateSpeed"
+            id="updateSpeed"
+            min="1"
+            max="100"
+          />
+        </div>
+        <div class="plotColor">
+          <p>Plot Color</p>
+          <input
+            type="color"
+            name="plotColor"
+            id="plotColor"
+          />
+        </div>
+        <div class="plotScaleX">
+          <p>ScaleX</p>
+          <input
+            type="range"
+            name="plotScaleX"
+            id="plotScaleX"
+            min="0.1"
+            max="10"
+            step="0.1"
+            value="1"
+          />
+        </div>
+      </div>
+
+      <div class="creatureTimeMenuIcon">
+        <span class="bar" style="--i: 1"></span
+        ><span class="bar" style="--i: 2"></span
+        ><span class="bar" style="--i: 3"></span>
+      </div>
+    </div>
     <div class="notifications"></div>
   </body>
   <script src="script.js"></script>

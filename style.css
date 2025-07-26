@@ -91,9 +91,81 @@ body {
       }
     }
   }
-  canvas#creatureTimeDiagram {
-    position: absolute;
-    top: 100vh;
+  div.creatureCanvasBox {
+    canvas#creatureTimeDiagram {
+      position: absolute;
+      top: 100vh;
+    }
+    div.creatureTimeMenu {
+      position: absolute;
+      top: calc(100vh + 10px);
+      right: 10px;
+      width: 300px;
+      min-height: 100px;
+      outline: solid;
+      background: rgba(255, 255, 255, 0.8);
+      pointer-events: none;
+      user-select: none;
+      opacity: 0;
+      h4 {
+        text-align: center;
+      }
+      > div {
+        display: flex;
+        > * {
+          margin: 5px;
+        }
+      }
+    }
+    input[type="checkbox"] {
+      position: absolute;
+      top: calc(100vh + 10px);
+      right: 10px;
+      transform: scale(2);
+      transform-origin: 100% 0%;
+      z-index: 1;
+      opacity: 0;
+      cursor: pointer;
+      &:checked {
+        ~ div.creatureTimeMenuIcon span.bar {
+          &:first-child {
+            transform: rotate(45deg);
+          }
+          &:nth-child(2) {
+            opacity: 0;
+          }
+          &:last-child {
+            transform: rotate(-45deg);
+          }
+        }
+        ~ div.creatureTimeMenu {
+          opacity: 1;
+          pointer-events: all;
+          user-select: all;
+          z-index: 1;
+        }
+      }
+    }
+    div.creatureTimeMenuIcon {
+      position: absolute;
+      right: 10px;
+      top: calc(100vh + 10px);
+      width: 28px;
+      height: 28px;
+      pointer-events: none;
+      > span.bar {
+        position: absolute;
+        display: block;
+        width: 28px;
+        height: 5px;
+        background-color: black;
+        top: calc((var(--i) - 1) * 10px + 3px);
+        opacity: 1;
+        transform: rotate(0deg);
+        transition: all 0.3s ease-in-out;
+        transform-origin: 0% 50%;
+      }
+    }
   }
   div.notifications {
     position: fixed;

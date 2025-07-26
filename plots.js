@@ -14,8 +14,8 @@ let ctCounter = 1;
 let limits = 30;
 let plotStepSize = 100;
 let plotData = [];
-plotData[0] = new Float32Array(1e4 / plotStepSize);
-plotData[1] = new Float32Array(1e4 / plotStepSize);
+plotData[0] = new Float32Array(1e4);
+plotData[1] = new Float32Array(1e4);
 let fillCounter = 0;
 function updatePlots() {
   if (ctCounter == valueCount) return;
@@ -89,6 +89,7 @@ function initPlots() {
         limits,
         creatureTimeCanvas.height - limits
       );
+      ctctx.strokeStyle = "black";
       ctctx.lineTo(limits, limits);
       ctctx.lineWidth = 3;
       ctctx.stroke();
@@ -122,6 +123,7 @@ function initPlots() {
         ctctx.stroke();
         ctctx.closePath();
         ctctx.font = "20px Arial";
+        //x axis ticks
         ctctx.fillText(
           x - limits,
           x,
@@ -141,6 +143,7 @@ function initPlots() {
         ctctx.stroke();
         ctctx.closePath();
         ctctx.font = "20px Arial";
+        //y axis ticks
         ctctx.fillText(
           Math.round(
             startCreatureCount -
@@ -195,13 +198,13 @@ function initPlots() {
       ctctx.strokeStyle = "red";
       ctctx.stroke();
       ctctx.closePath();
-
+      //title
       ctctx.fillText(
         "Alive creatures dependent on time",
         creatureTimeCanvas.width / 2 - 180,
         limits - 5
       );
-
+      //axis labels
       ctctx.save();
       ctctx.beginPath();
       ctctx.translate(

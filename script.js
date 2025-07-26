@@ -215,6 +215,8 @@ document.onload = init();
 function resetSim() {
   new Notification("Resetting simulation...", "log");
   cancelAnimationFrame(animationHandler);
+  simulationIsRunning = false;
+  initPlots();
   foodArr = [];
   creatureArr = [];
   ctx.clearRect(0, 0, canvas.width, canvas.height);

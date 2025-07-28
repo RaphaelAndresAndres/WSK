@@ -209,7 +209,100 @@ class Notification {
     }, 5000);
   }
 }
-function createNewGeneration() {}
+function createNewGeneration() {
+  new Notification("Creating new generation...", "log");
+  let healthArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
+  let speedArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
+  let hungerArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
+  let eatSpeedArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
+  for (
+    let i = 0;
+    i < evolutionParameters.survivorCount;
+    ++i
+  ) {
+    healthArr[i] = creatureArr[i].properties.health;
+    speedArr[i] = creatureArr[i].properties.speed;
+    hungerArr[i] = creatureArr[i].properties.hunger;
+    eatSpeedArr[i] = creatureArr[i].properties.eatSpeed;
+  }
+  let healthMean = Math.mean(healthArr);
+  let speedMean = Math.mean(speedArr);
+  let hungerMean = Math.mean(hungerArr);
+  let eatSpeedMean = Math.mean(eatSpeedArr);
+
+  let healthStd = Math.std(healthArr);
+  let speedStd = Math.std(speedArr);
+  let hungerStd = Math.std(hungerArr);
+  let eatSpeedStd = Math.std(eatSpeedArr);
+
+  let newHealthArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
+  let newSpeedArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
+  let newHungerArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
+  let newEatSpeedArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
+
+  for (
+    let i = 0;
+    i < evolutionParameters.survivorCount;
+    ++i
+  ) {
+    newHealthArr[i] =
+      healthMean +
+      Math.gaussianRandom(
+        0,
+        evolutionParameters.mutationRate * healthStd
+      );
+    newSpeedArr =
+      speedMean +
+      Math.gaussianRandom(
+        0,
+        evolutionParameters.mutationRate * speedStd
+      );
+    newHungerArr =
+      hungerMean +
+      Math.gaussianRandom(
+        0,
+        evolutionParameters.mutationRate * hungerStd
+      );
+    newEatSpeedArr =
+      eatSpeedMean +
+      Math.gaussianRandom(
+        0,
+        evolutionParameters.mutationRate * eatSpeedStd
+      );
+  }
+  for (
+    let i = 0;
+    i < evolutionParameters.survivorCount;
+    ++i
+  ) {
+    creatureArr.push(
+      new Creature({
+        index: i,
+        health: newHealthArr[i],
+        speed: newSpeedArr[i],
+        hunger: newHungerArr[i],
+        eatspeed: newEatSpeedArr[i],
+      })
+    );
+  }
+  startSim();
+}
 
 document.onload = init();
 function resetSim() {
@@ -217,8 +310,6 @@ function resetSim() {
   cancelAnimationFrame(animationHandler);
   simulationIsRunning = false;
   initPlots();
-  foodArr = [];
-  creatureArr = [];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 function startSim() {
@@ -276,17 +367,44 @@ function startSim() {
   animationHandler = requestAnimationFrame(loop);
   simulationIsRunning = true;
 }
+
 function init() {
   Math.distance = function (a, b) {
     return Math.sqrt(
       Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2)
     );
   };
-  {
-  }
+
+  Math.mean = function (arr) {
+    let sum = 0;
+    for (let i = 0; i < arr.length; ++i) {
+      sum += arr[i];
+    }
+    return sum / arr.length;
+  };
+
+  Math.std = function (arr) {
+    let sum = 0;
+    const mean = Math.mean(arr);
+    for (let i = 0; i < arr.length; ++i) {
+      sum += Math.pow(arr[i] - mean, 2);
+    }
+    return Math.sqrt(sum / arr.length);
+  };
+
   Math.clamp = function (x, min, max) {
     return Math.min(Math.max(x, min), max);
   };
+
+  Math.gaussianRandom = function (mean = 0, stdev = 1) {
+    const u = 1 - Math.random();
+    const v = Math.random();
+    const z =
+      Math.sqrt(-2.0 * Math.log(u)) *
+      Math.cos(2.0 * Math.PI * v);
+    return z * stdev + mean;
+  };
+
   function chooseClosestCreature(status) {
     if (creatureArr.length == 0) return;
     let min_distance = 1000;
@@ -403,10 +521,7 @@ function loop() {
   if (
     creatureArr.length <= evolutionParameters.survivorCount
   ) {
-    new Notification(
-      "Your simulation has stopped. Starting new generation...",
-      "log"
-    );
+    new Notification("Your simulation has stopped.", "log");
     resetSim();
     createNewGeneration();
   }

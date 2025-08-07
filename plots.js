@@ -10,12 +10,17 @@ let valueCount = 1e4;
 let ctTimeArr = new Uint8Array(valueCount);
 let ctCreatureArr = new Float32Array(valueCount);
 ctCreatureArr[0] = startCreatureCount;
-let ctCounter = 1;
+let ctCounter = 0;
 let limits = 30;
 let plotStepSize = 100;
 let plotData = [];
-plotData[0] = new Float32Array(1e4);
-plotData[1] = new Float32Array(1e4);
+for (
+  let i = 0;
+  i < evolutionParameters.generationCount;
+  ++i
+) {
+  plotData[i] = [new Int16Array(1e4), new Int16Array(1e4)];
+}
 let fillCounter = 0;
 function updatePlots() {
   if (ctCounter == valueCount) return;
@@ -40,28 +45,19 @@ function drawCTPlot() {
       ctCounter * scaleX + limits,
       offsetY - creatureArr.length * scaleY,
     ];
+    plotData[currentGeneration - 1][0][ctCounter] =
+      ctCounter;
+    plotData[currentGeneration - 1][1][ctCounter] =
+      creatureArr.length;
     if (fillCounter % plotStepSize == 0) {
       ctctx.beginPath();
       ctctx.arc(x, y, 3, 0, 2 * Math.PI);
-      ctctx.strokeStyle = `hsl(${currentGeneration},80%, 80%)`;
+      ctctx.strokeStyle = `hsl(${
+        ((currentGeneration - 1) /
+          evolutionParameters.generationCount) *
+        90
+      },80%, 50%)`;
       ctctx.lineWidth = 2;
-      ctctx.stroke();
-      ctctx.closePath();
-      if (fillCounter / plotStepSize < 1e4) {
-        plotData[0][fillCounter / plotStepSize] = x;
-        plotData[1][fillCounter / plotStepSize] = y;
-      }
-      ctctx.beginPath();
-      ctctx.moveTo(
-        plotData[0][fillCounter / plotStepSize - 1],
-        plotData[1][fillCounter / plotStepSize - 1]
-      );
-      ctctx.lineTo(
-        plotData[0][fillCounter / plotStepSize],
-        plotData[1][fillCounter / plotStepSize]
-      );
-      ctctx.strokeStyle = "black";
-      ctctx.lineWidth = 1;
       ctctx.stroke();
       ctctx.closePath();
     }
@@ -72,7 +68,7 @@ function drawCTPlot() {
 function initPlots() {
   {
     //reset environent variables
-    ctCounter = 1;
+    ctCounter = 0;
     /*ctctx.clearRect(
       0,
       0,
@@ -137,6 +133,7 @@ function initPlots() {
         y < creatureTimeCanvas.height - limits;
         y += gridSize
       ) {
+        72;
         ctctx.beginPath();
         ctctx.moveTo(limits, y);
         ctctx.lineTo(creatureTimeCanvas.width - limits, y);

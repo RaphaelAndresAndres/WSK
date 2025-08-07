@@ -321,12 +321,12 @@ function createNewGeneration() {
         "color:orange; font-style:italic"
       );
   }
-  document.getElementById("nsurvivors").value = Math.floor(
-    document.getElementById("nsurvivors").value * 0.9
+  let nextPopulationSize = Math.floor(
+    startCreatureCount * (1 - currentGeneration / 10)
   );
-  evolutionParameters.survivorCount = Math.floor(
-    evolutionParameters.survivorCount * 0.9
-  );
+  document.getElementById("nsurvivors").value =
+    nextPopulationSize;
+  evolutionParameters.survivorCount = nextPopulationSize;
   new Notification(
     "Finished generating new generation.",
     "error"
@@ -440,6 +440,8 @@ function init() {
       Math.cos(2.0 * Math.PI * v);
     return z * stdev + mean;
   };
+  document.getElementById("nsurvivors").value =
+    0.9 * startCreatureCount;
 
   function chooseClosestCreature(status) {
     if (creatureArr.length == 0) return;

@@ -43,7 +43,8 @@ function drawCTPlot() {
     if (fillCounter % plotStepSize == 0) {
       ctctx.beginPath();
       ctctx.arc(x, y, 3, 0, 2 * Math.PI);
-      ctctx.strokeStyle = "red";
+      ctctx.strokeStyle = `hsl(${currentGeneration},80%, 80%)`;
+      ctctx.lineWidth = 2;
       ctctx.stroke();
       ctctx.closePath();
       if (fillCounter / plotStepSize < 1e4) {
@@ -60,6 +61,7 @@ function drawCTPlot() {
         plotData[1][fillCounter / plotStepSize]
       );
       ctctx.strokeStyle = "black";
+      ctctx.lineWidth = 1;
       ctctx.stroke();
       ctctx.closePath();
     }
@@ -71,12 +73,12 @@ function initPlots() {
   {
     //reset environent variables
     ctCounter = 1;
-    ctctx.clearRect(
+    /*ctctx.clearRect(
       0,
       0,
       creatureTimeCanvas.width,
       creatureTimeCanvas.height
-    );
+    );*/
     ctTimeArr = new Uint8Array(valueCount);
     ctCreatureArr = new Float32Array(valueCount);
   }

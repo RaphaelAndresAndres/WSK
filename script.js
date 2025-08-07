@@ -17,6 +17,7 @@ let simulationIsRunning = false;
 let foodSpawnPercentage = 0.05;
 let speedMultiplier = 0.1;
 let frameCounter = 0;
+let currentGeneration = 1;
 
 let gameRules = {
   creatureSpawnsFoodOnDeath: false,
@@ -210,7 +211,14 @@ class Notification {
   }
 }
 function createNewGeneration() {
-  new Notification("Creating new generation...", "log");
+  currentGeneration++;
+  if (
+    currentGeneration - 1 ==
+    evolutionParameters.generationCount
+  ) {
+    new Notification("Finished all generations.", "warn");
+    return;
+  }
   let healthArr = new Float32Array(
     evolutionParameters.survivorCount
   );
@@ -231,7 +239,7 @@ function createNewGeneration() {
     healthArr[i] = creatureArr[i].properties.health;
     speedArr[i] = creatureArr[i].properties.speed;
     hungerArr[i] = creatureArr[i].properties.hunger;
-    eatSpeedArr[i] = creatureArr[i].properties.eatSpeed;
+    eatSpeedArr[i] = creatureArr[i].properties.eatspeed;
   }
   let healthMean = Math.mean(healthArr);
   let speedMean = Math.mean(speedArr);
@@ -256,6 +264,12 @@ function createNewGeneration() {
     evolutionParameters.survivorCount
   );
 
+  initPlots();
+  foodArr = [];
+  creatureArr = [];
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  new Notification("Creating new generation...", "log");
+
   for (
     let i = 0;
     i < evolutionParameters.survivorCount;
@@ -267,19 +281,19 @@ function createNewGeneration() {
         0,
         evolutionParameters.mutationRate * healthStd
       );
-    newSpeedArr =
+    newSpeedArr[i] =
       speedMean +
       Math.gaussianRandom(
         0,
         evolutionParameters.mutationRate * speedStd
       );
-    newHungerArr =
+    newHungerArr[i] =
       hungerMean +
       Math.gaussianRandom(
         0,
         evolutionParameters.mutationRate * hungerStd
       );
-    newEatSpeedArr =
+    newEatSpeedArr[i] =
       eatSpeedMean +
       Math.gaussianRandom(
         0,
@@ -291,17 +305,36 @@ function createNewGeneration() {
     i < evolutionParameters.survivorCount;
     ++i
   ) {
-    creatureArr.push(
-      new Creature({
-        index: i,
-        health: newHealthArr[i],
-        speed: newSpeedArr[i],
-        hunger: newHungerArr[i],
-        eatspeed: newEatSpeedArr[i],
-      })
-    );
+    if (newHealthArr[i] > 0)
+      creatureArr.push(
+        new Creature({
+          index: i,
+          health: newHealthArr[i],
+          speed: newSpeedArr[i],
+          hunger: newHungerArr[i],
+          eatspeed: newEatSpeedArr[i],
+        })
+      );
+    else
+      console.log(
+        "%c Skipped creation of creature: Too little health",
+        "color:orange; font-style:italic"
+      );
   }
-  startSim();
+  document.getElementById("nsurvivors").value = Math.floor(
+    document.getElementById("nsurvivors").value * 0.9
+  );
+  evolutionParameters.survivorCount = Math.floor(
+    evolutionParameters.survivorCount * 0.9
+  );
+  new Notification(
+    "Finished generating new generation.",
+    "error"
+  );
+  new Notification("Started simulation...", "log");
+  initPlots();
+  animationHandler = requestAnimationFrame(loop);
+  simulationIsRunning = true;
 }
 
 document.onload = init();
@@ -310,6 +343,8 @@ function resetSim() {
   cancelAnimationFrame(animationHandler);
   simulationIsRunning = false;
   initPlots();
+  foodArr = [];
+  creatureArr = [];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 function startSim() {
@@ -347,6 +382,7 @@ function startSim() {
     );
     return;
   }
+
   new Notification("Started simulation...", "log");
   initPlots();
 
@@ -515,14 +551,16 @@ function loop() {
     "creatureCount"
   )[0].innerHTML =
     "Creatures alive:  " + creatureArr.length;
+  document.getElementsByClassName(
+    "generationCount"
+  )[0].innerHTML = `Generation ${currentGeneration} / ${evolutionParameters.generationCount}`;
   updatePlots();
   animationHandler = requestAnimationFrame(loop);
   frameCounter++;
   if (
     creatureArr.length <= evolutionParameters.survivorCount
   ) {
-    new Notification("Your simulation has stopped.", "log");
-    resetSim();
+    cancelAnimationFrame(animationHandler);
     createNewGeneration();
   }
 }

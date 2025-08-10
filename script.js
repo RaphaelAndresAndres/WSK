@@ -18,21 +18,25 @@ let foodSpawnPercentage = 0.05;
 let speedMultiplier = 0.1;
 let frameCounter = 0;
 let currentGeneration = 1;
-
+let generationCountDifference;
+let survivorData = [];
 let gameRules = {
   creatureSpawnsFoodOnDeath: false,
 };
 let evolutionParameters = {
-  survivorCount: parseInt(
-    document.getElementById("nsurvivors").value
-  ),
+  survivorCount: startCreatureCount,
   mutationRate: parseFloat(
     document.getElementById("mutationrate").value
   ),
   generationCount: parseInt(
     document.getElementById("ngenerations").value
   ),
+  generationCountPercentage: parseFloat(
+    document.getElementById("generationSizePercentage")
+      .value
+  ),
 };
+
 class Food {
   constructor(properties) {
     this.properties = properties;
@@ -210,6 +214,21 @@ class Notification {
     }, 5000);
   }
 }
+
+function updateGlobalVariables() {
+  evolutionParameters.mutationRate = parseFloat(
+    document.getElementById("mutationrate").value
+  );
+  evolutionParameters.generationCount = parseInt(
+    document.getElementById("ngenerations").value
+  );
+  evolutionParameters.generationCountPercentage =
+    parseFloat(
+      document.getElementById("generationSizePercentage")
+        .value
+    );
+}
+
 function createNewGeneration() {
   currentGeneration++;
   if (
@@ -236,10 +255,17 @@ function createNewGeneration() {
     i < evolutionParameters.survivorCount;
     ++i
   ) {
-    healthArr[i] = creatureArr[i].properties.health;
-    speedArr[i] = creatureArr[i].properties.speed;
-    hungerArr[i] = creatureArr[i].properties.hunger;
-    eatSpeedArr[i] = creatureArr[i].properties.eatspeed;
+    try {
+      healthArr[i] = creatureArr[i].properties.health;
+      speedArr[i] = creatureArr[i].properties.speed;
+      hungerArr[i] = creatureArr[i].properties.hunger;
+      eatSpeedArr[i] = creatureArr[i].properties.eatspeed;
+    } catch (e) {
+      new Notification(
+        `Generating new creature failed, skipping: ${e}`,
+        "warn"
+      );
+    }
   }
   let healthMean = Math.mean(healthArr);
   let speedMean = Math.mean(speedArr);
@@ -315,18 +341,23 @@ function createNewGeneration() {
           eatspeed: newEatSpeedArr[i],
         })
       );
-    else
+    else {
       console.log(
         "%c Skipped creation of creature: Too little health",
         "color:orange; font-style:italic"
       );
+      //meaning: if the randomized hp of the creature is below 0, the program automatically kills it, therefore the goal survivorcount gets adjusted to avoid unexpected behavior.
+      evolutionParameters.survivorCount--;
+      if (evolutionParameters.survivorCount <= 0) {
+        new Notification(
+          "Survivor count has reached >= 0; too high mutationrate?"
+        );
+        return;
+      }
+    }
   }
-  let nextPopulationSize = Math.floor(
-    startCreatureCount * (1 - currentGeneration / 10)
-  );
-  document.getElementById("nsurvivors").value =
-    nextPopulationSize;
-  evolutionParameters.survivorCount = nextPopulationSize;
+  evolutionParameters.survivorCount -=
+    generationCountDifference;
   new Notification(
     "Finished generating new generation.",
     "error"
@@ -341,6 +372,7 @@ document.onload = init();
 function resetSim() {
   new Notification("Resetting simulation...", "log");
   cancelAnimationFrame(animationHandler);
+  evolutionParameters.survivorCount = startCreatureCount;
   simulationIsRunning = false;
   initPlots();
   foodArr = [];
@@ -405,6 +437,8 @@ function startSim() {
 }
 
 function init() {
+  updateGlobalVariables();
+
   Math.distance = function (a, b) {
     return Math.sqrt(
       Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2)
@@ -440,9 +474,21 @@ function init() {
       Math.cos(2.0 * Math.PI * v);
     return z * stdev + mean;
   };
-  document.getElementById("nsurvivors").value =
-    0.9 * startCreatureCount;
 
+  generationCountDifference = Math.round(
+    (1 - evolutionParameters.generationCountPercentage) *
+      startCreatureCount
+  );
+  evolutionParameters.survivorCount -=
+    generationCountDifference;
+
+  for (
+    let i = 0;
+    i < evolutionParameters.generationCount;
+    ++i
+  ) {
+    survivorData[i] = [];
+  }
   function chooseClosestCreature(status) {
     if (creatureArr.length == 0) return;
     let min_distance = 1000;

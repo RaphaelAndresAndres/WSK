@@ -7,9 +7,6 @@ creatureTimeCanvas.height = 500;
 const ctctx = creatureTimeCanvas.getContext("2d");
 
 let valueCount = 1e4;
-let ctTimeArr = new Uint8Array(valueCount);
-let ctCreatureArr = new Float32Array(valueCount);
-ctCreatureArr[0] = startCreatureCount;
 let ctCounter = 0;
 let limits = 30;
 let plotStepSize = 100;
@@ -19,13 +16,11 @@ for (
   i < evolutionParameters.generationCount;
   ++i
 ) {
-  plotData[i] = [new Int16Array(1e4), new Int16Array(1e4)];
+  plotData[i] = [new Int16Array(1e5), new Int16Array(1e5)];
 }
 let fillCounter = 0;
 function updatePlots() {
   if (ctCounter == valueCount) return;
-  ctTimeArr[ctCounter] = ctCounter;
-  ctCreatureArr[ctCounter] = creatureArr.length;
   ++ctCounter;
   drawCTPlot();
   if (ctCounter == valueCount) {
@@ -34,17 +29,20 @@ function updatePlots() {
 }
 function drawCTPlot() {
   {
-    //draw line
-    let scaleX =
-      (creatureTimeCanvas.width - 2 * limits) / valueCount;
-    let scaleY =
-      (creatureTimeCanvas.height - 2 * limits) /
-      startCreatureCount;
-    let offsetY = creatureTimeCanvas.height - limits;
-    let [x, y] = [
-      ctCounter * scaleX + limits,
-      offsetY - creatureArr.length * scaleY,
-    ];
+    function transformCoords(x, y) {
+      let scaleX =
+        (creatureTimeCanvas.width - 2 * limits) /
+        valueCount;
+      let scaleY =
+        (creatureTimeCanvas.height - 2 * limits) /
+        startCreatureCount;
+      let offsetY = creatureTimeCanvas.height - limits;
+      return [x * scaleX + limits, offsetY - y * scaleY];
+    }
+    let [x, y] = transformCoords(
+      ctCounter,
+      creatureArr.length
+    );
     plotData[currentGeneration - 1][0][ctCounter] =
       ctCounter;
     plotData[currentGeneration - 1][1][ctCounter] =
@@ -60,24 +58,36 @@ function drawCTPlot() {
       ctctx.lineWidth = 2;
       ctctx.stroke();
       ctctx.closePath();
+
+      if (ctCounter != 0) {
+        ctctx.beginPath();
+        let [x1, y1] = [
+          plotData[currentGeneration - 1][0][
+            ctCounter - plotStepSize
+          ],
+          plotData[currentGeneration - 1][1][
+            ctCounter - plotStepSize
+          ],
+        ];
+        let [x2, y2] = [
+          plotData[currentGeneration - 1][0][ctCounter],
+          plotData[currentGeneration - 1][1][ctCounter],
+        ];
+        [x1, y1] = transformCoords(x1, y1);
+        [x2, y2] = transformCoords(x2, y2);
+        ctctx.moveTo(x1, y1);
+        ctctx.lineTo(x2, y2);
+        ctctx.strokeStyle = "black";
+        ctctx.stroke();
+        ctctx.closePath();
+      }
     }
     ++fillCounter;
   }
 }
 
 function initPlots() {
-  {
-    //reset environent variables
-    ctCounter = 0;
-    /*ctctx.clearRect(
-      0,
-      0,
-      creatureTimeCanvas.width,
-      creatureTimeCanvas.height
-    );*/
-    ctTimeArr = new Uint8Array(valueCount);
-    ctCreatureArr = new Float32Array(valueCount);
-  }
+  ctCounter = -1;
   {
     //draw helper lines
     {
@@ -223,5 +233,87 @@ function initPlots() {
         creatureTimeCanvas.height - 5
       );
     }
+  }
+}
+
+function exportPlotData(type) {
+  if (type == "csv") {
+    new Notification(
+      "Exporting plot data as .csv...",
+      "log"
+    );
+    let newPlotData = "";
+    for (let i = 0; i < plotData[0][0].length; ++i) {
+      let check = 0;
+      let tempStr = "";
+      for (
+        let j = 0;
+        j < evolutionParameters.generationCount;
+        ++j
+      ) {
+        tempStr +=
+          plotData[j][1][i] != 0
+            ? plotData[j][1][i]
+            : "nan";
+        tempStr +=
+          j != evolutionParameters.generationCount - 1
+            ? ";"
+            : "";
+        check += plotData[j][1][i];
+      }
+      if (!check) break;
+      newPlotData += tempStr;
+      newPlotData += "\n";
+    }
+    console.log(newPlotData);
+    return newPlotData;
+  }
+  if (type == "JSON") {
+    new Notification(
+      "Exporting plot data as JSON...",
+      "log"
+    );
+    let newPlotData = [];
+    for (
+      let i = 0;
+      i < evolutionParameters.generationCount;
+      ++i
+    ) {
+      newPlotData[i] = [];
+      for (
+        let j = 0;
+        j < plotData[i][0].length && plotData[i][1][j] != 0;
+        ++j
+      ) {
+        newPlotData[i][j] = {
+          time: j,
+          creaturesAlive: plotData[i][1][j],
+        };
+      }
+    }
+    let newPlotDataString = JSON.stringify(newPlotData);
+    console.log(newPlotDataString);
+    return newPlotDataString;
+  }
+}
+
+function exportSurvivorData(type) {
+  if (type == "csv") {
+    new Notification(
+      "Exporting survivor data as .csv...",
+      "log"
+    );
+    let newSurvivorData = "";
+    console.log(newSurvivorData);
+    return newSurvivorData;
+  }
+  if (type == "JSON") {
+    new Notification(
+      "Exporting survivor data as JSON...",
+      "log"
+    );
+    let newSurvivorData = [];
+    console.log(newSurvivorData);
+    return newSurvivorData;
   }
 }

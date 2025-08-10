@@ -100,18 +100,25 @@
         </div>
         <div class="evolutionparameters">
           <h4>Evolution parameters</h4>
-          <div class="nsurvivors">
-            <p>Nr. of survivors</p>
+
+          <div class="newGenerationSizePercentage">
+            <p
+              title="Of the original population size. The difference is initialized once and is not relative to the current generation count."
+            >
+              Rel. Generation Size
+            </p>
             <input
               type="number"
-              name="Number of survivors"
-              title="Number of survivors for the next generation"
-              id="nsurvivors"
-              onchange="evolutionParameters.survivorCount = parseInt(this.value);"
-              value="10"
-              min="0"
+              name="generation Size Percentage"
+              id="generationSizePercentage"
+              value="0.9"
+              max="1"
+              min="0.1"
+              step="0.05"
+              onchange="updateGlobalVariables();"
             />
           </div>
+
           <div class="mutationrate">
             <p>Mutation rate</p>
             <input
@@ -124,6 +131,7 @@
               max="100"
               min="0"
               step="0.1"
+              onchange="updateGlobalVariables();"
             />
           </div>
           <div class="ngenerations">
@@ -150,14 +158,15 @@
       />
       <div class="creatureTimeMenu">
         <h4>Plot Menu</h4>
-        <div class="updateSpeed">
-          <p>Update Speed</p>
+        <div class="plotStepSize">
+          <p>Plot Step Size</p>
           <input
             type="number"
-            name="updateSpeed"
-            id="updateSpeed"
+            name="plotStepSize"
+            id="plotStepSize"
             min="1"
             max="100"
+            value="20"
           />
         </div>
         <div class="plotColor">
@@ -179,6 +188,40 @@
             step="0.1"
             value="1"
           />
+        </div>
+        <div class="exportPlotData">
+          <h4>Export Plot Data as:</h4>
+          <div>
+            <button
+              id="exportPlotDataCSV"
+              onclick="exportPlotData('csv');"
+            >
+              .csv
+            </button>
+            <button
+              id="exportPlotDataJSON"
+              onclick="exportPlotData('JSON');"
+            >
+              JSON
+            </button>
+          </div>
+        </div>
+        <div class="exportSurvivorData">
+          <h4>Export Survivor Data as:</h4>
+          <div>
+            <button
+              id="exportSurvivorDataCSV"
+              onclick="exportSurvivorData('csv');"
+            >
+              .csv
+            </button>
+            <button
+              id="exportSurvivorDataJSON"
+              onclick="exportSurvivorData('JSON');"
+            >
+              JSON
+            </button>
+          </div>
         </div>
       </div>
 

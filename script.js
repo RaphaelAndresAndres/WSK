@@ -581,11 +581,10 @@ function loop() {
       foodArr[i].draw();
     }
   }
-
   if (
     Math.random() <
     (foodSpawnPercentage * creatureArr.length) /
-      startCreatureCount
+      evolutionParameters.survivorCount
   ) {
     foodArr.push(
       new Food({

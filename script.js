@@ -24,7 +24,9 @@ let gameRules = {
   creatureSpawnsFoodOnDeath: false,
 };
 let evolutionParameters = {
-  survivorCount: startCreatureCount,
+  survivorCount: parseInt(
+    document.getElementById("startCreatureCount").value
+  ),
   mutationRate: parseFloat(
     document.getElementById("mutationrate").value
   ),
@@ -260,6 +262,12 @@ function createNewGeneration() {
       speedArr[i] = creatureArr[i].properties.speed;
       hungerArr[i] = creatureArr[i].properties.hunger;
       eatSpeedArr[i] = creatureArr[i].properties.eatspeed;
+      survivorData[currentGeneration - 2][i] = {
+        health: healthArr[i],
+        speed: speedArr[i],
+        hunger: hungerArr[i],
+        eatSpeed: eatSpeedArr[i],
+      };
     } catch (e) {
       new Notification(
         `Generating new creature failed, skipping: ${e}`,
@@ -347,17 +355,15 @@ function createNewGeneration() {
         "color:orange; font-style:italic"
       );
       //meaning: if the randomized hp of the creature is below 0, the program automatically kills it, therefore the goal survivorcount gets adjusted to avoid unexpected behavior.
-      evolutionParameters.survivorCount--;
+      //evolutionParameters.survivorCount--;
       if (evolutionParameters.survivorCount <= 0) {
         new Notification(
-          "Survivor count has reached >= 0; too high mutationrate?"
+          "Survivor count has reached <= 0; too high mutationrate?"
         );
         return;
       }
     }
   }
-  evolutionParameters.survivorCount -=
-    generationCountDifference;
   new Notification(
     "Finished generating new generation.",
     "error"
@@ -406,10 +412,11 @@ function startSim() {
       document.getElementById("spawnFoodOnDeath").checked;
   }
   if (
-    startCreatureCount <= evolutionParameters.survivorCount
+    evolutionParameters.generationCountPercentage >= 1 ||
+    evolutionParameters.generationCountPercentage <= 0
   ) {
     new Notification(
-      "Your starting creature count cannot be equal or less than the survivor count!",
+      "The relative generation size percentage must be in the interval (0,1).",
       "error"
     );
     return;
@@ -479,8 +486,6 @@ function init() {
     (1 - evolutionParameters.generationCountPercentage) *
       startCreatureCount
   );
-  evolutionParameters.survivorCount -=
-    generationCountDifference;
 
   for (
     let i = 0;
@@ -605,7 +610,11 @@ function loop() {
   animationHandler = requestAnimationFrame(loop);
   frameCounter++;
   if (
-    creatureArr.length <= evolutionParameters.survivorCount
+    creatureArr.length <=
+    Math.floor(
+      startCreatureCount *
+        evolutionParameters.generationCountPercentage
+    )
   ) {
     cancelAnimationFrame(animationHandler);
     createNewGeneration();

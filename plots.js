@@ -53,7 +53,7 @@ function drawCTPlot() {
       ctctx.strokeStyle = `hsl(${
         ((currentGeneration - 1) /
           evolutionParameters.generationCount) *
-        90
+        360
       },80%, 50%)`;
       ctctx.lineWidth = 2;
       ctctx.stroke();
@@ -312,8 +312,7 @@ function exportSurvivorData(type) {
       "Exporting survivor data as JSON...",
       "log"
     );
-    let newSurvivorData = [];
-    console.log(newSurvivorData);
-    return newSurvivorData;
+    console.log(JSON.stringify(survivorData));
+    return survivorData;
   }
 }

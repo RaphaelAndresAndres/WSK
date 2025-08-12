@@ -235,6 +235,13 @@ function initPlots() {
     }
   }
 }
+function copyTextToExport() {
+  let textArea = document.getElementById("textExport");
+  textArea.select();
+  textArea.setSelectionRange(0, 100000);
+  navigator.clipboard.writeText(textArea.value);
+  new Notification("Copied Data to clipboard", "log");
+}
 
 function exportPlotData(type) {
   if (type == "csv") {
@@ -265,9 +272,10 @@ function exportPlotData(type) {
       newPlotData += tempStr;
       newPlotData += "\n";
     }
-    console.log(newPlotData);
-    return newPlotData;
+    let textArea = document.getElementById("textExport");
+    textArea.value = newPlotData;
   }
+
   if (type == "JSON") {
     new Notification(
       "Exporting plot data as JSON...",
@@ -292,9 +300,12 @@ function exportPlotData(type) {
       }
     }
     let newPlotDataString = JSON.stringify(newPlotData);
-    console.log(newPlotDataString);
-    return newPlotDataString;
+    let textArea = document.getElementById("textExport");
+    textArea.value = newPlotDataString;
   }
+  document
+    .getElementsByClassName("textExport")[0]
+    .classList.add("active");
 }
 
 function exportSurvivorData(type) {
@@ -304,15 +315,14 @@ function exportSurvivorData(type) {
       "log"
     );
     let newSurvivorData = "";
-    console.log(newSurvivorData);
-    return newSurvivorData;
   }
   if (type == "JSON") {
     new Notification(
       "Exporting survivor data as JSON...",
       "log"
     );
-    console.log(JSON.stringify(survivorData));
-    return survivorData;
   }
+  document
+    .getElementsByClassName("textExport")[0]
+    .classList.add("active");
 }

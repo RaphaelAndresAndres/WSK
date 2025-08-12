@@ -232,6 +232,23 @@
       </div>
     </div>
     <div class="notifications"></div>
+    <div class="textExport">
+      <div class="header">Export Data</div>
+      <div class="textBox">
+        <textarea
+          name="textExport"
+          id="textExport"
+        ></textarea>
+        <button onclick="copyTextToExport()">Copy</button>
+      </div>
+      <div
+        class="closeTextBox"
+        onclick="document.getElementsByClassName('textExport')[0].classList.remove('active');"
+      >
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
   </body>
   <script src="script.js"></script>
   <script src="plots.js"></script>

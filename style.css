@@ -221,6 +221,69 @@ body {
       }
     }
   }
+  div.textExport {
+    position: fixed;
+    width: 700px;
+    height: 800px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    outline: solid;
+    background: rgba(0, 0, 0, 0.2);
+    display: none;
+    visibility: hidden;
+    pointer-events: none;
+    &.active {
+      display: block;
+      visibility: visible;
+      pointer-events: all;
+    }
+    div.header {
+      text-align: center;
+      font-size: 2em;
+    }
+    div.textBox {
+      min-height: 700px;
+      width: 700px;
+      textarea {
+        background: rgba(255, 255, 255, 0.4);
+        outline: 1px solid;
+        margin: 50px;
+        width: 600px;
+        min-height: 600px;
+      }
+      button {
+        position: absolute;
+        font-size: 1.2em;
+        padding: 5px;
+        top: 100px;
+        right: 50px;
+      }
+    }
+    div.closeTextBox {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      span {
+        position: absolute;
+        display: block;
+        background-color: black;
+        width: 40px;
+        height: 8px;
+        top: 16px;
+        transform-origin: 0% 50;
+        &:first-child {
+          transform: rotate(45deg);
+        }
+        &:last-child {
+          transform: rotate(-45deg);
+        }
+      }
+    }
+  }
 }
 
 @keyframes notification_fade {

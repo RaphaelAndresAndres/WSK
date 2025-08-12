@@ -487,6 +487,8 @@ function init() {
       startCreatureCount
   );
 
+  document.getElementById("textExport").value = "";
+
   for (
     let i = 0;
     i < evolutionParameters.generationCount;

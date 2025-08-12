@@ -195,7 +195,7 @@ class Creature {
     ctx.closePath();
   }
 }
-class Notification {
+class ScreenNotification {
   constructor(message, type) {
     this.message = message;
     this.type = type;
@@ -237,7 +237,10 @@ function createNewGeneration() {
     currentGeneration - 1 ==
     evolutionParameters.generationCount
   ) {
-    new Notification("Finished all generations.", "warn");
+    new ScreenNotification(
+      "Finished all generations.",
+      "warn"
+    );
     return;
   }
   let healthArr = new Float32Array(
@@ -252,28 +255,19 @@ function createNewGeneration() {
   let eatSpeedArr = new Float32Array(
     evolutionParameters.survivorCount
   );
-  for (
-    let i = 0;
-    i < evolutionParameters.survivorCount;
-    ++i
-  ) {
-    try {
-      healthArr[i] = creatureArr[i].properties.health;
-      speedArr[i] = creatureArr[i].properties.speed;
-      hungerArr[i] = creatureArr[i].properties.hunger;
-      eatSpeedArr[i] = creatureArr[i].properties.eatspeed;
-      survivorData[currentGeneration - 2][i] = {
-        health: healthArr[i],
-        speed: speedArr[i],
-        hunger: hungerArr[i],
-        eatSpeed: eatSpeedArr[i],
-      };
-    } catch (e) {
-      new Notification(
-        `Generating new creature failed, skipping: ${e}`,
-        "warn"
-      );
-    }
+
+  for (let i = 0; i < creatureArr.length; ++i) {
+    healthArr[i] = creatureArr[i].properties.health;
+    speedArr[i] = creatureArr[i].properties.speed;
+    hungerArr[i] = creatureArr[i].properties.hunger;
+    eatSpeedArr[i] = creatureArr[i].properties.eatspeed;
+    survivorData[currentGeneration - 2][i] = {};
+    survivorData[currentGeneration - 2][i] = {
+      health: healthArr[i],
+      speed: speedArr[i],
+      hunger: hungerArr[i],
+      eatSpeed: eatSpeedArr[i],
+    };
   }
   let healthMean = Math.mean(healthArr);
   let speedMean = Math.mean(speedArr);
@@ -285,90 +279,58 @@ function createNewGeneration() {
   let hungerStd = Math.std(hungerArr);
   let eatSpeedStd = Math.std(eatSpeedArr);
 
-  let newHealthArr = new Float32Array(
-    evolutionParameters.survivorCount
-  );
-  let newSpeedArr = new Float32Array(
-    evolutionParameters.survivorCount
-  );
-  let newHungerArr = new Float32Array(
-    evolutionParameters.survivorCount
-  );
-  let newEatSpeedArr = new Float32Array(
-    evolutionParameters.survivorCount
-  );
-
   initPlots();
   foodArr = [];
   creatureArr = [];
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  new Notification("Creating new generation...", "log");
-
-  for (
-    let i = 0;
-    i < evolutionParameters.survivorCount;
-    ++i
+  new ScreenNotification(
+    "Creating new generation...",
+    "log"
+  );
+  let index = 0;
+  while (
+    creatureArr.length < evolutionParameters.survivorCount
   ) {
-    newHealthArr[i] =
+    let health =
       healthMean +
       Math.gaussianRandom(
         0,
         evolutionParameters.mutationRate * healthStd
       );
-    newSpeedArr[i] =
+    if (health <= 0) continue;
+    let speed =
       speedMean +
       Math.gaussianRandom(
         0,
         evolutionParameters.mutationRate * speedStd
       );
-    newHungerArr[i] =
+    let hunger =
       hungerMean +
       Math.gaussianRandom(
         0,
         evolutionParameters.mutationRate * hungerStd
       );
-    newEatSpeedArr[i] =
+    let eatspeed =
       eatSpeedMean +
       Math.gaussianRandom(
         0,
         evolutionParameters.mutationRate * eatSpeedStd
       );
+    creatureArr.push(
+      new Creature({
+        index: index,
+        health: health,
+        speed: speed,
+        hunger: hunger,
+        eatspeed,
+      })
+    );
   }
-  for (
-    let i = 0;
-    i < evolutionParameters.survivorCount;
-    ++i
-  ) {
-    if (newHealthArr[i] > 0)
-      creatureArr.push(
-        new Creature({
-          index: i,
-          health: newHealthArr[i],
-          speed: newSpeedArr[i],
-          hunger: newHungerArr[i],
-          eatspeed: newEatSpeedArr[i],
-        })
-      );
-    else {
-      console.log(
-        "%c Skipped creation of creature: Too little health",
-        "color:orange; font-style:italic"
-      );
-      //meaning: if the randomized hp of the creature is below 0, the program automatically kills it, therefore the goal survivorcount gets adjusted to avoid unexpected behavior.
-      //evolutionParameters.survivorCount--;
-      if (evolutionParameters.survivorCount <= 0) {
-        new Notification(
-          "Survivor count has reached <= 0; too high mutationrate?"
-        );
-        return;
-      }
-    }
-  }
-  new Notification(
+  new ScreenNotification(
     "Finished generating new generation.",
     "error"
   );
-  new Notification("Started simulation...", "log");
+  new ScreenNotification("Started simulation...", "log");
   initPlots();
   animationHandler = requestAnimationFrame(loop);
   simulationIsRunning = true;
@@ -376,7 +338,7 @@ function createNewGeneration() {
 
 document.onload = init();
 function resetSim() {
-  new Notification("Resetting simulation...", "log");
+  new ScreenNotification("Resetting simulation...", "log");
   cancelAnimationFrame(animationHandler);
   evolutionParameters.survivorCount = startCreatureCount;
   simulationIsRunning = false;
@@ -388,7 +350,7 @@ function resetSim() {
 function startSim() {
   {
     if (simulationIsRunning) {
-      new Notification(
+      new ScreenNotification(
         "Simulation is already running. ",
         "warning"
       );
@@ -415,14 +377,14 @@ function startSim() {
     evolutionParameters.generationCountPercentage >= 1 ||
     evolutionParameters.generationCountPercentage <= 0
   ) {
-    new Notification(
+    new ScreenNotification(
       "The relative generation size percentage must be in the interval (0,1).",
       "error"
     );
     return;
   }
 
-  new Notification("Started simulation...", "log");
+  new ScreenNotification("Started simulation...", "log");
   initPlots();
 
   for (let i = 0; i < startCreatureCount; ++i) {
@@ -536,10 +498,10 @@ function init() {
 function toggleSimulation() {
   if (simulationIsRunning) {
     cancelAnimationFrame(animationHandler);
-    new Notification("Paused simulation", "log");
+    new ScreenNotification("Paused simulation", "log");
   } else {
     animationHandler = requestAnimationFrame(loop);
-    new Notification("Resumed simulation", "log");
+    new ScreenNotification("Resumed simulation", "log");
   }
   simulationIsRunning = !simulationIsRunning;
 }

@@ -240,12 +240,12 @@ function copyTextToExport() {
   textArea.select();
   textArea.setSelectionRange(0, 100000);
   navigator.clipboard.writeText(textArea.value);
-  new Notification("Copied Data to clipboard", "log");
+  new ScreenNotification("Copied Data to clipboard", "log");
 }
 
 function exportPlotData(type) {
   if (type == "csv") {
-    new Notification(
+    new ScreenNotification(
       "Exporting plot data as .csv...",
       "log"
     );
@@ -277,7 +277,7 @@ function exportPlotData(type) {
   }
 
   if (type == "JSON") {
-    new Notification(
+    new ScreenNotification(
       "Exporting plot data as JSON...",
       "log"
     );
@@ -310,18 +310,20 @@ function exportPlotData(type) {
 
 function exportSurvivorData(type) {
   if (type == "csv") {
-    new Notification(
+    new ScreenNotification(
       "Exporting survivor data as .csv...",
       "log"
     );
     let newSurvivorData = "";
   }
   if (type == "JSON") {
-    new Notification(
+    new ScreenNotification(
       "Exporting survivor data as JSON...",
       "log"
     );
   }
+  document.getElementById("textExport").value =
+    JSON.stringify(survivorData);
   document
     .getElementsByClassName("textExport")[0]
     .classList.add("active");

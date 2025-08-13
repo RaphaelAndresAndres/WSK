@@ -6,7 +6,7 @@ canvas.height = window.innerHeight;
 
 let creatureArr = [];
 let foodArr = [];
-let startCreatureCount = 100;
+let startCreatureCount;
 let startFoodCount = 90;
 let animationHandler;
 let mouseCoords = [];
@@ -229,6 +229,9 @@ function updateGlobalVariables() {
       document.getElementById("generationSizePercentage")
         .value
     );
+  evolutionParameters.survivorCount = parseInt(
+    document.getElementById("startCreatureCount").value
+  );
 }
 
 function createNewGeneration() {
@@ -383,7 +386,7 @@ function startSim() {
     );
     return;
   }
-
+  updateGlobalVariables();
   new ScreenNotification("Started simulation...", "log");
   initPlots();
 

@@ -236,7 +236,18 @@ function updateGlobalVariables() {
 
 function createNewGeneration() {
   currentGeneration++;
-
+  let healthArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
+  let speedArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
+  let hungerArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
+  let eatSpeedArr = new Float32Array(
+    evolutionParameters.survivorCount
+  );
   for (let i = 0; i < creatureArr.length; ++i) {
     healthArr[i] = creatureArr[i].properties.health;
     speedArr[i] = creatureArr[i].properties.speed;
@@ -260,18 +271,6 @@ function createNewGeneration() {
     );
     return;
   }
-  let healthArr = new Float32Array(
-    evolutionParameters.survivorCount
-  );
-  let speedArr = new Float32Array(
-    evolutionParameters.survivorCount
-  );
-  let hungerArr = new Float32Array(
-    evolutionParameters.survivorCount
-  );
-  let eatSpeedArr = new Float32Array(
-    evolutionParameters.survivorCount
-  );
 
   let healthMean = Math.mean(healthArr);
   let speedMean = Math.mean(speedArr);

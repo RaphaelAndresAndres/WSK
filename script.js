@@ -236,6 +236,20 @@ function updateGlobalVariables() {
 
 function createNewGeneration() {
   currentGeneration++;
+
+  for (let i = 0; i < creatureArr.length; ++i) {
+    healthArr[i] = creatureArr[i].properties.health;
+    speedArr[i] = creatureArr[i].properties.speed;
+    hungerArr[i] = creatureArr[i].properties.hunger;
+    eatSpeedArr[i] = creatureArr[i].properties.eatspeed;
+    survivorData[currentGeneration - 2][i] = {};
+    survivorData[currentGeneration - 2][i] = {
+      health: healthArr[i],
+      speed: speedArr[i],
+      hunger: hungerArr[i],
+      eatSpeed: eatSpeedArr[i],
+    };
+  }
   if (
     currentGeneration - 1 ==
     evolutionParameters.generationCount
@@ -259,19 +273,6 @@ function createNewGeneration() {
     evolutionParameters.survivorCount
   );
 
-  for (let i = 0; i < creatureArr.length; ++i) {
-    healthArr[i] = creatureArr[i].properties.health;
-    speedArr[i] = creatureArr[i].properties.speed;
-    hungerArr[i] = creatureArr[i].properties.hunger;
-    eatSpeedArr[i] = creatureArr[i].properties.eatspeed;
-    survivorData[currentGeneration - 2][i] = {};
-    survivorData[currentGeneration - 2][i] = {
-      health: healthArr[i],
-      speed: speedArr[i],
-      hunger: hungerArr[i],
-      eatSpeed: eatSpeedArr[i],
-    };
-  }
   let healthMean = Math.mean(healthArr);
   let speedMean = Math.mean(speedArr);
   let hungerMean = Math.mean(hungerArr);

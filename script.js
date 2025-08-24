@@ -104,9 +104,6 @@ class Creature {
     this.hunger = this.maxHunger;
     this.goalFoodIndex = -1;
     this.status = "inactive";
-    this.color = `rgb(${Math.random() * 255},${
-      Math.random() * 255
-    },${Math.random() * 255})`;
     ctx.lineWidth = 1;
     this.color = "darkgreen";
     this.isAlive = true;
@@ -178,7 +175,9 @@ class Creature {
       } else if (this.isAtFood) {
         foodArr[this.goalFoodIndex].hp -=
           this.eatSpeed / 100;
-        this.hunger += this.eatSpeed / 100;
+        if (this.hunger < this.maxHunger) {
+          this.hunger += this.eatSpeed / 100;
+        }
       }
     }
   }
@@ -355,7 +354,7 @@ function startSim() {
     if (simulationIsRunning) {
       new ScreenNotification(
         "Simulation is already running. ",
-        "warning"
+        "warn"
       );
       return;
     }

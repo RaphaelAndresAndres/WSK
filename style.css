@@ -210,7 +210,7 @@ body {
         animation-play-state: paused;
         opacity: 1 !important;
       }
-      &.warning {
+      &.warn {
         background: rgba(255, 215, 38, 0.8);
       }
       &.error {

@@ -87,7 +87,17 @@ function drawCTPlot() {
 }
 
 function initPlots() {
+  ctctx.clearRect(
+    0,
+    0,
+    creatureTimeCanvas.width,
+    creatureTimeCanvas.height
+  );
   ctCounter = -1;
+  plotStepSize =
+    parseInt(
+      document.getElementById("plotStepSize").value
+    ) ?? 20;
   {
     //draw helper lines
     {

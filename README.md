@@ -1,6 +1,6 @@
 # WSK
 
-This is a simple simulation program without using any third-party libraries.
+This is a simple simulation program without using any third-party libraries. Link at https://projektwsk.pages.dev/
 
 ## How to use it
 
